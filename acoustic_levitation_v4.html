@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Acoustic Levitation Simulator v4.1</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+#wrap{display:flex;width:100%;min-height:680px;background:#080c10;border-radius:8px;overflow:hidden}
+#sidebar{width:220px;min-width:220px;background:#0d1117;border-right:1px solid #1e2a35;padding:12px;display:flex;flex-direction:column;gap:9px;overflow-y:auto}
+#cw{flex:1;position:relative}
+canvas#mc{display:block;width:100%;height:100%}
+.pt{font-size:9px;letter-spacing:2px;color:#3a6a7a;text-transform:uppercase;margin-bottom:3px;font-family:'Courier New',monospace}
+.kr{display:flex;gap:6px;justify-content:space-around}
+.kw{display:flex;flex-direction:column;align-items:center;gap:2px}
+canvas.knob{cursor:ns-resize;border-radius:50%}
+.kl{font-size:8px;color:#3a6a7a;letter-spacing:1px;text-align:center;font-family:'Courier New',monospace}
+.kv{font-size:11px;color:#7ec8e3;font-weight:bold;font-family:'Courier New',monospace}
+.sep{height:1px;background:#1e2a35}
+.sr{display:flex;flex-direction:column;gap:3px}
+.sr label{font-size:9px;color:#3a6a7a;letter-spacing:1px;display:flex;justify-content:space-between;font-family:'Courier New',monospace}
+.sr label span{color:#7ec8e3}
+input[type=range]{width:100%;height:3px;appearance:none;background:#1e3040;border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:12px;height:12px;border-radius:50%;background:#7ec8e3;cursor:pointer}
+.btn{background:#0d1f2d;border:1px solid #1e3a4a;color:#7ec8e3;font-family:'Courier New',monospace;font-size:9px;letter-spacing:1px;padding:5px 8px;cursor:pointer;border-radius:3px;text-transform:uppercase;width:100%;transition:background .12s}
+.btn:hover{background:#1a3040}
+.btn.red{border-color:#3a1a1a;color:#e37c7c}
+.btn.red:hover{background:#2a0e0e}
+.br{display:flex;gap:4px}
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.mb{background:#0a1820;border:1px solid #1a2e3e;color:#4a7a8a;font-size:8px;padding:4px 3px;cursor:pointer;border-radius:3px;text-align:center;line-height:1.4;font-family:'Courier New',monospace;transition:all .12s}
+.mb:hover{border-color:#2a5a7a;color:#7ec8e3}
+.mb.sel{border-color:#7ec8e3;color:#bde8f5;background:#0d2535}
+.ol{display:flex;flex-direction:column;gap:3px;max-height:110px;overflow-y:auto}
+.oi{display:flex;align-items:center;justify-content:space-between;background:#0a1820;border:1px solid #1a2e3e;border-radius:3px;padding:3px 6px;font-size:9px;color:#4a7a8a;font-family:'Courier New',monospace}
+.oi.lev{border-color:#39ff14;color:#39ff14}
+.od{background:none;border:none;color:#4a2a2a;cursor:pointer;font-size:12px;padding:0 2px}
+.od:hover{color:#e37c7c}
+.strow{display:flex;justify-content:space-between}
+.sl{font-size:9px;color:#3a6a7a;font-family:'Courier New',monospace}
+.sv{font-size:10px;color:#7ec8e3;font-family:'Courier New',monospace}
+.lg{display:flex;flex-direction:column;gap:3px}
+.lr{display:flex;align-items:center;gap:6px;font-size:9px;color:#3a6a7a;font-family:'Courier New',monospace}
+.ld{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<div id="wrap">
+<div id="sidebar">
+  <div style="font-size:10px;color:#7ec8e3;letter-spacing:2px;text-align:center;padding:5px 0 6px;border-bottom:1px solid #1e2a35;font-family:'Courier New',monospace">ACOUSTIC LEV SIM</div>
+
+  <div>
+    <div class="pt">Frequenze (Hz)</div>
+    <div class="kr">
+      <div class="kw"><canvas class="knob" id="k-fb" width="52" height="52"></canvas><div class="kl">FREQ BOT</div><div class="kv" id="v-fb">40.0</div></div>
+      <div class="kw"><canvas class="knob" id="k-ft" width="52" height="52"></canvas><div class="kl">FREQ TOP</div><div class="kv" id="v-ft">40.0</div></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="pt">Fase</div>
+    <div class="kr">
+      <div class="kw"><canvas class="knob" id="k-pb" width="52" height="52"></canvas><div class="kl">FASE BOT</div><div class="kv" id="v-pb">0.00</div></div>
+      <div class="kw"><canvas class="knob" id="k-pt" width="52" height="52"></canvas><div class="kl">FASE TOP</div><div class="kv" id="v-pt">0.00</div></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="pt">Visualizzazione</div>
+    <div class="kr">
+      <div class="kw"><canvas class="knob" id="k-z" width="52" height="52"></canvas><div class="kl">ZOOM</div><div class="kv" id="v-z">4.0</div></div>
+      <div class="kw"><canvas class="knob" id="k-amp" width="52" height="52"></canvas><div class="kl">AMPIEZZA</div><div class="kv" id="v-amp">90</div></div>
+    </div>
+    <div class="mg" style="margin-top:8px">
+      <button class="mb sel" id="btn-show-trans" style="padding:4px">Trasversale</button>
+      <button class="mb sel" id="btn-show-long" style="padding:4px">Longitudinale</button>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <div>
+    <div class="pt">Velocità sim</div>
+    <div class="sr">
+      <label>Speed <span id="v-spd">1.00x</span></label>
+      <input type="range" id="sl-spd" min="0" max="2" step="0.1" value="1">
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <div>
+    <div class="pt">Nuovo oggetto</div>
+    <div class="sr">
+      <label>Raggio (mm) <span id="v-rad">1.5</span></label>
+      <input type="range" id="sl-rad" min="0.1" max="3" step="0.1" value="1.5">
+    </div>
+    <div class="sr" style="margin-top:4px">
+      <label>Densità (g/cm³) <span id="v-dens">1.00</span></label>
+      <input type="range" id="sl-dens" min="1" max="113" value="10" step="1">
+    </div>
+    <div class="pt" style="margin-top:5px">Materiale</div>
+    <div class="mg" id="mgrid"></div>
+    <button class="btn" id="btn-add" style="margin-top:5px">+ Aggiungi oggetto</button>
+  </div>
+
+  <div class="sep"></div>
+
+  <div>
+    <div class="pt">Oggetti nella scena</div>
+    <div class="ol" id="olist"></div>
+    <button class="btn red" id="btn-da" style="margin-top:4px">Elimina tutti</button>
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="lg">
+    <div class="pt">Legenda</div>
+    <div class="lr"><div class="ld" style="background:#00b4ff;opacity:.8"></div>Onda basso</div>
+    <div class="lr"><div class="ld" style="background:#ff9620;opacity:.8"></div>Onda alto</div>
+    <div class="lr"><div class="ld" style="background:#ffe060"></div>Onda stazionaria</div>
+    <div class="lr"><div class="ld" style="background:#00ffff"></div>Nodi (min pressione)</div>
+    <div class="lr"><div class="ld" style="background:#ff3333"></div>Antinodi (max press.)</div>
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="br">
+    <button class="btn" id="btn-rst">Reset</button>
+    <button class="btn" id="btn-pp">Pausa</button>
+  </div>
+
+  <div style="margin-top:4px">
+    <div class="strow"><span class="sl">λ</span><span class="sv" id="s-lam">8.575mm</span></div>
+    <div class="strow"><span class="sl">k</span><span class="sv" id="s-k">0.7330</span></div>
+    <div class="strow"><span class="sl">Δφ</span><span class="sv" id="s-dp">0.00°</span></div>
+    <div class="strow"><span class="sl">Levitanti</span><span class="sv" id="s-lev">0/0</span></div>
+  </div>
+</div>
+
+<div id="cw"><canvas id="mc"></canvas></div>
+</div>
+
+<script>
+  let showTrans = true;
+  let showLong = true;
+
+  document.getElementById('btn-show-trans').onclick = function(){
+    showTrans = !showTrans;
+    this.classList.toggle('sel', showTrans);
+  };
+  document.getElementById('btn-show-long').onclick = function(){
+    showLong = !showLong;
+    this.classList.toggle('sel', showLong);
+  };
+const MATS=[
+  {name:'Polistir.',density:0.025,color:'#d0e8f8',symbol:'PS'},
+  {name:'Semola',  density:0.75, color:'#e8d070',symbol:'SM'},
+  {name:'Legno',   density:0.6,  color:'#c89050',symbol:'WD'},
+  {name:'Acqua',   density:1.0,  color:'#40b8e8',symbol:'H₂O'},
+  {name:'Vetro',   density:2.5,  color:'#90d8ef',symbol:'GL'},
+  {name:'Allum.',  density:2.7,  color:'#b0b8c8',symbol:'Al'},
+  {name:'Ferro',   density:7.87, color:'#8090a8',symbol:'Fe'},
+  {name:'Piombo',  density:11.3, color:'#607080',symbol:'Pb'},
+];
+
+
+const mgrid=document.getElementById('mgrid');
+let selMat=0;
+MATS.forEach((m,i)=>{
+  const b=document.createElement('div');
+  b.className='mb'+(i===0?' sel':'');
+  b.innerHTML=`<div style="color:${m.color};font-weight:bold;font-size:10px">${m.symbol}</div><div>${m.name}</div><div style="color:#2a5060">${m.density}</div>`;
+  b.onclick=()=>{
+    document.querySelectorAll('.mb').forEach(x=>x.classList.remove('sel'));
+    b.classList.add('sel');selMat=i;
+    document.getElementById('sl-dens').value=Math.round(MATS[i].density*10);
+    document.getElementById('v-dens').textContent=MATS[i].density.toFixed(2);
+  };
+  mgrid.appendChild(b);
+});
+
+class Knob{
+  constructor(id,mn,mx,v,st,inf){
+    this.c=document.getElementById(id);this.x=this.c.getContext('2d');
+    this.min=mn;this.max=mx;this.value=v;this.step=st||0.1;
+    this.inf=!!inf;this.drag=false;this.ly=0;this.la=0;
+    this.c.addEventListener('mousedown',e=>this._dn(e));
+    window.addEventListener('mousemove',e=>this._mv(e));
+    window.addEventListener('mouseup',()=>{this.drag=false});
+    this.c.addEventListener('wheel',e=>{
+      e.preventDefault();
+      const d=e.deltaY<0?this.step:-this.step;
+      if(this.inf)this.value+=d;
+      else this.value=Math.min(this.max,Math.max(this.min,this.value+d));
+      this.draw();
+    },{passive:false});
+    this.draw();
+  }
+  _dn(e){this.drag=true;this.ly=e.clientY;this.la=Math.atan2(e.offsetY-26,e.offsetX-26)}
+  _mv(e){
+    if(!this.drag)return;
+    if(this.inf){
+      const r=this.c.getBoundingClientRect();
+      const a=Math.atan2(e.clientY-r.top-26,e.clientX-r.left-26);
+      let d=a-this.la;
+      if(d>Math.PI)d-=2*Math.PI;if(d<-Math.PI)d+=2*Math.PI;
+      this.value=(this.value+d)%(2*Math.PI);
+      if(this.value<0)this.value+=2*Math.PI;
+      this.la=a;
+    }else{
+      const dy=this.ly-e.clientY;
+      this.value=Math.min(this.max,Math.max(this.min,this.value+dy*(this.max-this.min)*0.004));
+      this.ly=e.clientY;
+    }
+    this.draw();
+  }
+  draw(){
+    const c=this.x,W=52,cx=26,cy=26,r=21;
+    c.clearRect(0,0,W,W);
+    c.beginPath();c.arc(cx,cy,r,0,2*Math.PI);c.fillStyle='#141e28';c.fill();
+    c.strokeStyle='#1e3040';c.lineWidth=1;c.stroke();
+    const sA=Math.PI*.75,eA=Math.PI*2.25;
+    c.beginPath();c.arc(cx,cy,r-4,sA,eA);c.strokeStyle='#1e3a4a';c.lineWidth=3;c.stroke();
+    const angle=this.inf?this.value:sA+(this.value-this.min)/(this.max-this.min)*(eA-sA);
+    c.beginPath();c.arc(cx,cy,r-4,sA,angle);c.strokeStyle='#7ec8e3';c.lineWidth=3;c.stroke();
+    const nx=cx+Math.cos(angle)*(r-8),ny=cy+Math.sin(angle)*(r-8);
+    c.beginPath();c.arc(nx,ny,3,0,2*Math.PI);c.fillStyle='#bde8f5';c.fill();
+  }
+}
+
+const kFB=new Knob('k-fb',10,80,40,.5,false);
+const kFT=new Knob('k-ft',10,80,40,.5,false);
+const kPB=new Knob('k-pb',0,0,0,.05,true);
+const kPT=new Knob('k-pt',0,0,0,.05,true);
+const kZ =new Knob('k-z',4,16,4,.1,false);
+const kAmp=new Knob('k-amp',10,200,90,1,false);
+
+// Funzione per sincronizzare le frequenze
+const syncFreq = (source, target) => {
+  target.value = source.value;
+  target.draw();
+};
+
+// Listener per il doppio clic su FREQ BOT
+kFB.c.addEventListener('dblclick', () => syncFreq(kFT, kFB));
+
+// Listener per il doppio clic su FREQ TOP
+kFT.c.addEventListener('dblclick', () => syncFreq(kFB, kFT));
+
+const slSpd=document.getElementById('sl-spd');
+const slRad=document.getElementById('sl-rad');
+const slDens=document.getElementById('sl-dens');
+let simSpeed=1;
+
+slSpd.addEventListener('input',()=>{
+  simSpeed=parseFloat(slSpd.value);
+  document.getElementById('v-spd').textContent=simSpeed.toFixed(2)+'x';
+});
+slRad.addEventListener('input',()=>document.getElementById('v-rad').textContent=parseFloat(slRad.value).toFixed(1));
+slDens.addEventListener('input',()=>document.getElementById('v-dens').textContent=(parseInt(slDens.value)/10).toFixed(2));
+
+let objects=[],objId=0,paused=false;
+
+class LevObj{
+  constructor(x,y,rMm,dens,mat){
+    this.id=++objId;this.x=x;this.y=y;
+    this.rMm=rMm;this.dens=dens;this.mat=mat;
+    this.vx=0;this.vy=0;
+    this.dragging=false;this.lev=false;
+    this.rot=0;this.rotV=0;
+    this.trail=[];this.spawnT=1.5;
+  }
+  get mass(){ const r=this.rMm*1e-3; return this.dens*1e3*(4/3)*Math.PI*r*r*r; }
+  get rPx(){ return Math.max(6,this.rMm*3.8); }
+}
+
+function addObject(){
+  const w=mc.width,h=mc.height;
+  objects.push(new LevObj(w*0.68, h*0.5, parseFloat(slRad.value), parseInt(slDens.value)/10, MATS[selMat]));
+  updateList();
+}
+function delObj(id){
+  objects=objects.filter(o=>o.id!==id);
+  updateList();
+}
+function updateList(){
+  const list=document.getElementById('olist');
+  list.innerHTML='';
+  objects.forEach(o=>{
+    const d=document.createElement('div');
+    d.className='oi';
+    d.id=`oi-${o.id}`;
+    d.innerHTML=`<span style="color:${o.mat.color}">${o.mat.symbol}</span><span>${o.rMm.toFixed(1)}mm ${o.dens.toFixed(2)}g/cc</span><button class="od" data-id="${o.id}">✕</button>`;
+    list.appendChild(d);
+  });
+  list.querySelectorAll('.od').forEach(b=>b.onclick=()=>delObj(parseInt(b.dataset.id)));
+}
+
+// Aggiorna dinamicamente le classi di levitazione senza distruggere i listener dei click
+function updateListLevitationVisuals() {
+  objects.forEach(o => {
+    const el = document.getElementById(`oi-${o.id}`);
+    if (el) {
+      if (o.lev) el.classList.add('lev');
+      else el.classList.remove('lev');
+    }
+  });
+  document.getElementById('s-lev').textContent=`${objects.filter(o=>o.lev).length}/${objects.length}`;
+}
+
+document.getElementById('btn-add').onclick=addObject;
+document.getElementById('btn-da').onclick=()=>{objects=[];updateList()};
+document.getElementById('btn-rst').onclick=()=>{
+  kFB.value=40;kFT.value=40;kPB.value=0;kPT.value=0;kZ.value=4;kAmp.value=90;
+  [kFB,kFT,kPB,kPT,kZ,kAmp].forEach(k=>k.draw());
+  objects=[];updateList();
+};
+const ppBtn=document.getElementById('btn-pp');
+ppBtn.onclick=()=>{paused=!paused;ppBtn.textContent=paused?'Play':'Pausa'};
+
+const mc=document.getElementById('mc');
+const ctx=mc.getContext('2d');
+const cw=document.getElementById('cw');
+function resize(){mc.width=cw.clientWidth||540;mc.height=Math.max(cw.clientHeight,660)}
+resize();
+new ResizeObserver(resize).observe(cw);
+
+let dragO=null,dox=0,doy=0;
+mc.addEventListener('mousedown',e=>{
+  const rect=mc.getBoundingClientRect();
+  const sx=mc.width/rect.width,sy=mc.height/rect.height;
+  const mx=(e.clientX-rect.left)*sx,my=(e.clientY-rect.top)*sy;
+  for(let i=objects.length-1;i>=0;i--){
+    const o=objects[i];
+    if(Math.hypot(mx-o.x,my-o.y)<o.rPx+6){dragO=o;dox=mx-o.x;doy=my-o.y;o.dragging=true;o.vx=0;o.vy=0;break}
+  }
+});
+mc.addEventListener('mousemove',e=>{
+  if(!dragO)return;
+  const rect=mc.getBoundingClientRect();
+  dragO.x=(e.clientX-rect.left)*mc.width/rect.width-dox;
+  dragO.y=(e.clientY-rect.top)*mc.height/rect.height-doy;
+});
+mc.addEventListener('mouseup',()=>{if(dragO){dragO.dragging=false;dragO=null}});
+mc.addEventListener('mouseleave',()=>{if(dragO){dragO.dragging=false;dragO=null}});
+
+const SOUND=343;
+
+function standingAmplitude(y, h, fb, ft, kb, kt, pb, pt, amp, zoom){
+  const zs = Math.max(1, zoom);
+  const yC = h * 0.5;
+  const ys = (y - yC) / zs + yC; 
+  const yb = h - ys;
+  
+  const alpha = kb * yb + pb;
+  const beta  = kt * ys + pt;
+  return amp * Math.cos((alpha - beta) * 0.5);
+}
+
+function acousticForce(y, h, fb, ft, kb, kt, pb, pt, amp, zoom, rPx){
+  let sumForce = 0;
+  const samples = 5; 
+  const sampleRadius = rPx * 0.4; 
+
+  for(let i = -samples; i <= samples; i++) {
+    const offset = (i / samples) * sampleRadius;
+    const dy = 1; 
+    const e1 = standingAmplitude(y + offset + dy, h, fb, ft, kb, kt, pb, pt, amp, zoom);
+    const e2 = standingAmplitude(y + offset - dy, h, fb, ft, kb, kt, pb, pt, amp, zoom);
+    
+    sumForce -= (e1*e1 - e2*e2) / (2*dy);
+  }
+  return sumForce / (2 * samples + 1);
+}
+
+function physStep(dtSec, o, h, fb, ft, kb, kt, pb, pt, amp, zoom){
+  if(o.dragging)return;
+  if(o.spawnT>0)o.spawnT=Math.max(0,o.spawnT-dtSec);
+
+  const w = mc.width;
+  const cx = w * 0.68;
+
+  const Fac = acousticForce(o.y, h, fb, ft, kb, kt, pb, pt, amp, zoom, o.rPx);
+  const lam = 343 / ((fb + ft) * 0.5); 
+  
+  const sizeFactor = o.rMm > (lam / 3) ? -1 : 1;
+  const gravity  = o.dens * 0.3; 
+  const acoustic = Fac * 0.0015 * Math.max(1, zoom) * sizeFactor; 
+
+  const ay = gravity + acoustic;            
+  const ax = (cx - o.x) * 0.015; 
+
+  o.vx = (o.vx + ax) * 0.85; 
+  o.vy = (o.vy + ay) * 0.85;
+
+  o.vx = Math.max(-15, Math.min(15, o.vx));
+  o.vy = Math.max(-15, Math.min(15, o.vy));
+
+  o.x += o.vx;
+  o.y += o.vy;
+
+  o.rot  += o.rotV;
+  o.rotV *= 0.98;
+
+  const rPx = o.rPx;
+  if(o.y < rPx){o.y=rPx;o.vy=Math.abs(o.vy)*0.25}
+  if(o.y > h-rPx){o.y=h-rPx;o.vy=-Math.abs(o.vy)*0.25}
+  if(o.x < rPx){o.x=rPx;o.vx=Math.abs(o.vx)*0.25}
+  if(o.x > w-rPx){o.x=w-rPx;o.vx=-Math.abs(o.vx)*0.25}
+
+  const spd = Math.hypot(o.vx,o.vy);
+  o.lev = spd < 0.8;
+
+  o.trail.push({x:o.x,y:o.y});
+  if(o.trail.length>35)o.trail.shift();
+}
+
+function drawWaves(c, w, h, t, fb, ft, kb, kt, pb, pt, amp, zoom) {
+  const cx = w * 0.68, yC = h * .5, zs = Math.max(1, zoom);
+  const omB = 2 * Math.PI * fb * .02, omT = 2 * Math.PI * ft * .02;
+
+// --- 1. VISUALIZZAZIONE LONGITUDINALE ADATTIVA (Sfondo) ---
+  if(showLong){
+    const cols = 25; 
+    const spacingX = 10; 
+    const startX = cx - Math.floor(cols / 2) * spacingX;
+    
+    // Fissiamo il passo verticale per avere sempre lo stesso numero di punti
+    const spacingY = 12; 
+    
+    const colors = ['#40b8e8', '#90d8ef', '#bde8f5', '#7ec8e3', '#3a6a7a'];
+    
+    for (let i = 0; i < cols; i++) {
+      c.fillStyle = colors[i % colors.length];
+      c.beginPath();
+      const px = startX + i * spacingX;
+      
+      // Iteriamo in base all'altezza del canvas, non allo zoom
+      for (let basePy = 0; basePy <= h; basePy += spacingY) {
+        // La posizione di riposo reale nel sistema
+        const ys = (basePy - yC) / zs + yC;
+        const yb = h - ys;
+        
+        // Lo spostamento scala con lo zoom per essere visibile, 
+        // ma limitato a meno della metà dello spacingY per evitare sovrapposizioni.
+        const visualPush = Math.min(15, 2.5 * zs); 
+        
+        const dyB = visualPush * Math.cos(kb * yb - omB * t + pb); 
+        const dyT = visualPush * Math.cos(kt * ys - omT * t + pt);
+        
+        const finalY = basePy + (dyB - dyT); 
+        
+        if (finalY >= 0 && finalY <= h) {
+          c.rect(px, finalY - 1, 3, 3);
+        }
+      }
+      c.fill();
+    }
+  }
+
+  // --- 2. VISUALIZZAZIONE TRASVERSALE (Primo piano) ---
+  // Onda Trasduttore Basso (Azzurra)
+  if(showTrans){
+    c.lineWidth = 2; c.strokeStyle = 'rgba(0,180,255,0.8)'; c.beginPath();
+    for(let py = 0; py <= h; py += 2) {
+      const ys = (py - yC) / zs + yC, yb = h - ys;
+      const xw = amp * Math.sin(kb * yb - omB * t + pb); 
+      py === 0 ? c.moveTo(cx + xw, py) : c.lineTo(cx + xw, py);
+    }
+    c.stroke();
+
+    // Onda Trasduttore Alto (Arancione)
+    c.strokeStyle = 'rgba(255,150,0,0.8)'; c.beginPath();
+    for(let py = 0; py <= h; py += 2) {
+      const ys = (py - yC) / zs + yC;
+      const xw = amp * Math.sin(kt * ys - omT * t + pt); 
+      py === 0 ? c.moveTo(cx + xw, py) : c.lineTo(cx + xw, py);
+    }
+    c.stroke();
+
+    // Onda Stazionaria Sommata (Gialla)
+    c.lineWidth = 3.5; c.strokeStyle = 'rgba(255,240,80,0.95)'; c.beginPath();
+    for(let py = 0; py <= h; py += 2) {
+      const ys = (py - yC) / zs + yC, yb = h - ys;
+      const a1 = Math.sin(kb * yb - omB * t + pb);
+      const a2 = Math.sin(kt * ys - omT * t + pt);
+      const sw = amp * .5 * (a1 + a2);
+      py === 0 ? c.moveTo(cx + sw, py) : c.lineTo(cx + sw, py);
+    }
+    c.stroke();
+  }
+  // --- 3. PALLINI DEI NODI/ANTINODI ---
+  const sameF = Math.abs(fb - ft) < .001;
+  if (sameF && kb > .0001) {
+    const ySMin = (0 - yC) / zs + yC, ySMax = (h - yC) / zs + yC;
+    const phOff = (kb * h + pb - pt) * .5;
+    
+    // Nodi (Azzurri)
+    const nMn = Math.ceil((kb * ySMin - phOff - Math.PI / 2) / Math.PI);
+    const nMx = Math.floor((kb * ySMax - phOff - Math.PI / 2) / Math.PI);
+    for(let n = nMn; n <= nMx; n++) {
+      const ys = (phOff + Math.PI / 2 + n * Math.PI) / kb;
+      const py = (ys - yC) * zs + yC;
+      if (py < 5 || py > h - 5) continue;
+      c.beginPath(); c.arc(cx, py, 5, 0, 2 * Math.PI); 
+      c.fillStyle = '#00ffff'; c.fill();
+      c.lineWidth = 1.5; c.strokeStyle = 'rgba(0,0,0,0.6)'; c.stroke();
+    }
+    
+    // Antinodi (Rossi)
+    const mMn = Math.ceil((kb * ySMin - phOff) / Math.PI);
+    const mMx = Math.floor((kb * ySMax - phOff) / Math.PI);
+    for(let m = mMn; m <= mMx; m++) {
+      const ys = (phOff + m * Math.PI) / kb;
+      const py = (ys - yC) * zs + yC;
+      if (py < 5 || py > h - 5) continue;
+      c.beginPath(); c.arc(cx, py, 5, 0, 2 * Math.PI); 
+      c.fillStyle = '#ff3333'; c.fill();
+      c.lineWidth = 1.5; c.strokeStyle = 'rgba(0,0,0,0.6)'; c.stroke();
+    }
+  }
+
+  // Linea centrale e Testi
+  c.strokeStyle = 'rgba(180,180,180,0.35)'; c.lineWidth = 1; c.setLineDash([4, 4]);
+  c.beginPath(); c.moveTo(cx, 0); c.lineTo(cx, h); c.stroke(); c.setLineDash([]);
+  c.textAlign = 'center'; c.font = 'bold 10px Courier New';
+  c.fillStyle = 'rgba(0,180,255,0.75)'; c.fillText('TRASDUTTORE BASSO', cx, h - 8);
+  c.fillStyle = 'rgba(255,150,0,0.75)'; c.fillText('TRASDUTTORE ALTO', cx, 14);
+  c.textAlign = 'left';
+}
+
+function drawObjects(c,h,t,fb,ft,kb,kt,pb,pt,amp){
+  const now=t; 
+  objects.forEach(o=>{
+    if(o.trail.length>1){
+      for(let i=1;i<o.trail.length;i++){
+        const a=(i/o.trail.length)*.3;
+        c.strokeStyle='#39ff14'+Math.round(a*255).toString(16).padStart(2,'0');
+        c.lineWidth=1.2;c.beginPath();
+        c.moveTo(o.trail[i-1].x,o.trail[i-1].y);c.lineTo(o.trail[i].x,o.trail[i].y);c.stroke();
+      }
+    }
+
+    const rPx=o.rPx;
+    const env=standingAmplitude(o.y,h,fb,ft,kb,kt,pb,pt,amp);
+    const comp=1+env*0.0008;
+
+    c.save();c.translate(o.x,o.y);c.rotate(o.rot);c.scale(comp,1/Math.max(0.5,comp));
+
+    if(o.lev){
+      const pulse=.5+.5*Math.sin(now*3.5);
+      c.beginPath();c.arc(0,0,rPx+10+pulse*3,0,2*Math.PI);
+      c.strokeStyle=`rgba(57,255,20,${.12+pulse*.1})`;c.lineWidth=2;c.stroke();
+      c.beginPath();c.arc(0,0,rPx+4,0,2*Math.PI);
+      c.strokeStyle=`rgba(57,255,20,${.5+pulse*.2})`;c.lineWidth=2;c.stroke();
+    }
+
+    if(o.dragging){
+      c.beginPath();c.arc(0,0,rPx+7,0,2*Math.PI);
+      c.strokeStyle='rgba(255,220,0,.85)';c.lineWidth=2.5;c.stroke();
+    }
+
+    if(o.spawnT>0){
+      const sf=o.spawnT/1.5;
+      c.beginPath();c.arc(0,0,rPx*(1+sf*.9),0,2*Math.PI);
+      c.strokeStyle=`rgba(57,255,20,${sf*.9})`;c.lineWidth=3;c.stroke();
+    }
+
+    c.beginPath();c.arc(0,0,rPx,0,2*Math.PI);
+    c.fillStyle='#163a1a';c.fill();
+    c.beginPath();c.arc(-rPx*.22,-rPx*.22,rPx*.35,0,2*Math.PI);
+    c.fillStyle='rgba(100,255,80,.16)';c.fill();
+    c.beginPath();c.arc(0,0,rPx,0,2*Math.PI);
+    c.strokeStyle=o.lev?'#39ff14':o.dragging?'#ffe040':'#2dcc10';
+    c.lineWidth=o.lev?2.5:2;c.stroke();
+
+    if(rPx>=10){
+      c.fillStyle='#39ff14';
+      c.font=`bold ${Math.max(9,Math.round(rPx*.44))}px Courier New`;
+      c.textAlign='center';c.textBaseline='middle';
+      c.fillText(o.mat.symbol,0,0);
+    }
+    c.restore();
+
+    if(rPx>8){
+      c.fillStyle='rgba(57,255,20,.7)';c.font='9px Courier New';c.textAlign='center';
+      const m=o.mass;
+      c.fillText(m<.001?m.toExponential(1)+'kg':m.toFixed(5)+'kg',o.x,o.y+rPx+11);
+    }
+  });
+}
+
+function drawHUD(c,w,h,fb,ft,pb,pt){
+  const lam=SOUND/((fb+ft)*.5);
+  const k=2*Math.PI/lam;
+  const pd=Math.abs(pb-pt)*180/Math.PI;
+  document.getElementById('s-lam').textContent=lam.toFixed(3)+'mm';
+  document.getElementById('s-k').textContent=k.toFixed(4);
+  document.getElementById('s-dp').textContent=pd.toFixed(2)+'°';
+  
+  // Rimosso updateList() da qui! Al suo posto chiamiamo solo l'aggiornamento grafico
+  updateListLevitationVisuals();
+  
+  c.save();
+  c.fillStyle='rgba(8,12,16,.82)';c.strokeStyle='rgba(30,60,80,.6)';c.lineWidth=1;
+  c.beginPath();c.roundRect(8,h-64,360,58,4);c.fill();c.stroke();
+  c.fillStyle='rgba(126,200,227,.65)';c.font='9px Courier New';c.textAlign='left';
+  c.fillText('U_Gorkov = V * [ f1*(p²)/(2ρc²) - f2*3ρ(v²)/4 ]',13,h-47);
+  c.fillText('Mie Scattering Regime: R > λ/3 -> Trapped at Antinodes',13,h-32);
+  c.fillText(`Oggetti: ${objects.length}  Levitanti: ${objects.filter(o=>o.lev).length}  Speed: ${simSpeed.toFixed(2)}x`,13,h-15);
+  c.restore();
+}
+
+function drawGrid(c, w, h) {
+  c.strokeStyle = 'rgba(30, 42, 53, 0.4)';
+  c.lineWidth = 1;
+  c.beginPath();
+  for (let x = 0; x < w; x += 40) {
+    c.moveTo(x, 0); c.lineTo(x, h);
+  }
+  for (let y = 0; y < h; y += 40) {
+    c.moveTo(0, y); c.lineTo(w, y);
+  }
+  c.stroke();
+}
+
+let lastTS=null;
+let physicsAccumulator = 0;
+let simTime = 0;
+
+function frame(ts){
+  if(lastTS===null)lastTS=ts;
+  const rawDt=Math.min((ts-lastTS)/1000,.05);
+  lastTS=ts;
+
+  const w=mc.width,h=mc.height;
+  const fb=kFB.value,ft=kFT.value;
+  const pb=kPB.value,pt=kPT.value;
+  const amp=kAmp.value,zoom=kZ.value;
+  
+  // Forza la velocità in modo lineare e pulito basandosi sul fader (0.0x - 2.0x)
+  simSpeed = parseFloat(slSpd.value);
+  document.getElementById('v-spd').textContent=simSpeed.toFixed(2)+'x';
+
+  const lB=SOUND/fb,lT=SOUND/ft;
+  const kb=2*Math.PI/lB,kt=2*Math.PI/lT;
+
+  [kFB,kFT,kPB,kPT,kZ,kAmp].forEach(k=>k.draw());
+  document.getElementById('v-fb').textContent=kFB.value.toFixed(1);
+  document.getElementById('v-ft').textContent=kFT.value.toFixed(1);
+  document.getElementById('v-pb').textContent=kPB.value.toFixed(2);
+  document.getElementById('v-pt').textContent=kPT.value.toFixed(2);
+  document.getElementById('v-z').textContent=kZ.value.toFixed(1);
+  document.getElementById('v-amp').textContent=Math.round(kAmp.value);
+
+  if(!paused && simSpeed > 0){
+    simTime += rawDt * simSpeed;
+    
+    physicsAccumulator += simSpeed;
+    let steps = Math.floor(physicsAccumulator);
+    physicsAccumulator -= steps;
+    steps = Math.min(steps, 10);
+    
+    for(let i = 0; i < steps; i++){
+      objects.forEach(o => physStep(rawDt, o, h, fb, ft, kb, kt, pb, pt, amp, zoom));
+    }
+  }
+
+  ctx.fillStyle='#080c10';ctx.fillRect(0,0,w,h);
+  drawGrid(ctx,w,h);
+  
+  drawWaves(ctx, w, h, simTime, fb, ft, kb, kt, pb, pt, amp, zoom);
+  drawObjects(ctx, h, simTime, fb, ft, kb, kt, pb, pt, amp);
+  drawHUD(ctx, w, h, fb, ft, pb, pt);
+
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
