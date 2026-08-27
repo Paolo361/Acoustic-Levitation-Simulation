@@ -5,65 +5,65 @@
 <title>Acoustic Levitation Simulator v6.2 - Perfect Physics</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body {background: #040608; padding: 12px; height: 100vh; overflow: hidden; display: flex; font-family:'Courier New',monospace;}
-#wrap{display:flex;width:100%;height:100%;background:#080c10;border-radius:12px;border: 1px solid #1e2a35;overflow:hidden}
+body {background: #121212; padding: 12px; height: 100vh; overflow: hidden; display: flex; font-family:'Courier New',monospace;}
+#wrap{display:flex;width:100%;height:100%;background:#191919;border-radius:12px;border: 1px solid rgba(244,245,240,0.16);overflow:hidden}
 
 /* Left Sidebar */
-#left-sidebar{width:325px;min-width:325px;background:#0d1117;border-right:1px solid #1e2a35;padding:20px;display:flex;flex-direction:column;gap:15px;overflow-y:auto}
+#left-sidebar{width:325px;min-width:325px;background:#1A1A1A;border-right:1px solid rgba(244,245,240,0.14);padding:20px;display:flex;flex-direction:column;gap:15px;overflow-y:auto}
 
 /* Center */
-#cw{flex:1;position:relative;background:#06090c;}
+#cw{flex:1;position:relative;background:#151515;}
 canvas#mc{display:block;width:100%;height:100%}
 
 /* Right Sidebar */
-#right-sidebar{width:400px;min-width:400px;background:#0d1117;border-left:1px solid #1e2a35;padding:20px;display:flex;flex-direction:column;gap:15px;overflow-y:auto}
+#right-sidebar{width:400px;min-width:400px;background:#1A1A1A;border-left:1px solid rgba(244,245,240,0.14);padding:20px;display:flex;flex-direction:column;gap:15px;overflow-y:auto}
 
 /* Typography & UI */
-.pt{font-size:14px;letter-spacing:2px;color:#3a6a7a;text-transform:uppercase;margin-bottom:6px;font-weight:bold}
+.pt{font-size:14px;letter-spacing:2px;color:#ECEDE8;text-transform:uppercase;margin-bottom:6px;font-weight:bold}
 .kr{display:flex;gap:10px;justify-content:space-around}
 .kw{display:flex;flex-direction:column;align-items:center;gap:5px}
 canvas.knob{cursor:ns-resize;border-radius:50%;transition:transform 0.1s}
 canvas.knob:hover{filter:brightness(1.2);transform:scale(1.03)}
-.kl{font-size:11px;color:#3a6a7a;letter-spacing:1px;text-align:center}
-.kv{font-size:16px;color:#7ec8e3;font-weight:bold}
-.sep{height:1px;background:#1e2a35;margin:5px 0}
+.kl{font-size:11px;color:#EDEEEA;letter-spacing:1px;text-align:center}
+.kv{font-size:16px;color:#F4F5F0;font-weight:bold}
+.sep{height:1px;background:rgba(244,245,240,0.16);margin:5px 0}
 .sr{display:flex;flex-direction:column;gap:6px}
-.sr label{font-size:13px;color:#3a6a7a;letter-spacing:1px;display:flex;justify-content:space-between}
-.sr label span{color:#7ec8e3;font-weight:bold}
-input[type=range]{width:100%;height:6px;appearance:none;background:#1e3040;border-radius:3px;outline:none;cursor:pointer}
-input[type=range]::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:#7ec8e3;cursor:pointer}
-.btn{background:#0d1f2d;border:1px solid #1e3a4a;color:#7ec8e3;font-size:14px;letter-spacing:1px;padding:9px 12px;cursor:pointer;border-radius:5px;text-transform:uppercase;width:100%;transition:background .12s; font-weight:bold;}
-.btn:hover{background:#1a3040;color:#bde8f5}
-.btn.red{border-color:#5a2222;color:#e37c7c}
-.btn.red:hover{background:#3a1414}
+.sr label{font-size:13px;color:#EAEAE5;letter-spacing:1px;display:flex;justify-content:space-between}
+.sr label span{color:#F4F5F0;font-weight:bold}
+input[type=range]{width:100%;height:6px;appearance:none;background:#1A1A1A;border-radius:3px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:#F4F5F0;cursor:pointer}
+.btn{background:#171717;border:1px solid rgba(244,245,240,0.24);color:#F4F5F0;font-size:14px;letter-spacing:1px;padding:9px 12px;cursor:pointer;border-radius:5px;text-transform:uppercase;width:100%;transition:background .12s; font-weight:bold;}
+.btn:hover{background:#202020;color:#F4F5F0}
+.btn.red{border-color:rgba(244,245,240,0.2);color:#F4F5F0}
+.btn.red:hover{background:#212121}
 .br{display:flex;gap:8px}
 .mg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.mb{background:#0a1820;border:1px solid #1a2e3e;color:#4a7a8a;font-size:12px;padding:8px 5px;cursor:pointer;border-radius:5px;text-align:center;line-height:1.4;transition:all .12s}
-.mb:hover{border-color:#2a5a7a;color:#7ec8e3}
-.mb.sel{border-color:#7ec8e3;color:#bde8f5;background:#0d2535;box-shadow: 0 0 8px rgba(126,200,227,0.2)}
+.mb{background:#171717;border:1px solid rgba(244,245,240,0.18);color:#F4F5F0;font-size:12px;padding:8px 5px;cursor:pointer;border-radius:5px;text-align:center;line-height:1.4;transition:all .12s}
+.mb:hover{border-color:rgba(244,245,240,0.38);color:#F4F5F0}
+.mb.sel{border-color:#F4F5F0;color:#141414;background:#F4F5F0;box-shadow: 0 0 8px rgba(244,245,240,0.12)}
 .ol{display:flex;flex-direction:column;gap:5px;max-height:180px;overflow-y:auto}
-.oi{display:flex;align-items:center;justify-content:space-between;background:#0a1820;border:1px solid #1a2e3e;border-radius:5px;padding:6px 10px;font-size:13px;color:#4a7a8a}
+.oi{display:flex;align-items:center;justify-content:space-between;background:#171717;border:1px solid rgba(244,245,240,0.16);border-radius:5px;padding:6px 10px;font-size:13px;color:#F4F5F0}
 .oi.lev-node{border-color:#39ff14;color:#39ff14;box-shadow:inset 0 0 5px rgba(57,255,20,0.15)}
 .oi.lev-anti{border-color:#ff3333;color:#ff3333;box-shadow:inset 0 0 5px rgba(255,51,51,0.15)}
-.od{background:none;border:none;color:#5a3a3a;cursor:pointer;font-size:16px;padding:0 3px;font-weight:bold}
-.od:hover{color:#e37c7c}
+.od{background:none;border:none;color:#F4F5F0;cursor:pointer;font-size:16px;padding:0 3px;font-weight:bold;opacity:0.8}
+.od:hover{color:#F4F5F0;opacity:1}
 .strow{display:flex;justify-content:space-between;margin-bottom:3px}
 .lg{display:flex;flex-direction:column;gap:5px}
-.lr{display:flex;align-items:center;gap:10px;font-size:12px;color:#4a7a8a}
+.lr{display:flex;align-items:center;gap:10px;font-size:12px;color:#F4F5F0}
 .ld{width:11px;height:11px;border-radius:50%;flex-shrink:0}
 
 /* Gor'kov Panel Styles */
-.gorkov-panel {background:#070a0e;border:1px solid #2a4050;padding:12px;border-radius:8px;font-size:13px;line-height:1.6; color:#7ec8e3;}
-.gorkov-title {text-align:center;font-weight:bold;color:#bde8f5;margin-bottom:8px;border-bottom:1px solid #1e3a4a;padding-bottom:5px; font-size:14px;}
-.g-formula {text-align:center;font-size:14px;margin:10px 0;background:#0d1822;padding:8px;border-radius:5px;color:#39ff14; letter-spacing: 0.5px;}
-.g-highlight {color: #ff9620; font-weight: bold;}
+.gorkov-panel {background:#181818;border:1px solid rgba(244,245,240,0.16);padding:12px;border-radius:8px;font-size:13px;line-height:1.6; color:#F4F5F0;}
+.gorkov-title {text-align:center;font-weight:bold;color:#F4F5F0;margin-bottom:8px;border-bottom:1px solid rgba(244,245,240,0.16);padding-bottom:5px; font-size:14px;}
+.g-formula {text-align:center;font-size:14px;margin:10px 0;background:#1D1D1D;padding:8px;border-radius:5px;color:#F4F5F0; letter-spacing: 0.5px;}
+.g-highlight {color: #F4F5F0; font-weight: bold;}
 </style>
 </head>
 <body>
 
 <div id="wrap">
 <div id="left-sidebar">
-  <div style="font-size:16px;color:#7ec8e3;letter-spacing:3px;text-align:center;padding:5px 0 10px;border-bottom:1px solid #1e2a35;font-weight:bold">WAVE ENGINE</div>
+  <div style="font-size:16px;color:#F4F5F0;letter-spacing:3px;text-align:center;padding:5px 0 10px;border-bottom:1px solid rgba(244,245,240,0.18);font-weight:bold">WAVE ENGINE</div>
 
   <div>
     <div class="pt">Frequenze (Hz)</div>
@@ -107,7 +107,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:18px;height:18px;b
 <div id="cw"><canvas id="mc"></canvas></div>
 
 <div id="right-sidebar">
-  <div style="font-size:16px;color:#39ff14;letter-spacing:3px;text-align:center;padding:5px 0 10px;border-bottom:1px solid #1e2a35;font-weight:bold">GOR'KOV DYNAMICS</div>
+  <div style="font-size:16px;color:#F4F5F0;letter-spacing:3px;text-align:center;padding:5px 0 10px;border-bottom:1px solid rgba(244,245,240,0.18);font-weight:bold">GOR'KOV DYNAMICS</div>
   
   <div>
     <div class="pt">Crea Oggetto</div>
@@ -286,14 +286,14 @@ class Knob{
   draw(){
     const c=this.x, W=75, cx=37.5, cy=37.5, r=30;
     c.clearRect(0,0,W,W);
-    c.beginPath();c.arc(cx,cy,r,0,2*Math.PI);c.fillStyle='#141e28';c.fill();
-    c.strokeStyle='#1e3040';c.lineWidth=1;c.stroke();
+    c.beginPath();c.arc(cx,cy,r,0,2*Math.PI);c.fillStyle='#141414';c.fill();
+    c.strokeStyle='rgba(244,245,240,0.22)';c.lineWidth=1;c.stroke();
     const sA=Math.PI*.75, eA=Math.PI*2.25;
-    c.beginPath();c.arc(cx,cy,r-5,sA,eA);c.strokeStyle='#1e3a4a';c.lineWidth=4;c.stroke();
+    c.beginPath();c.arc(cx,cy,r-5,sA,eA);c.strokeStyle='rgba(244,245,240,0.3)';c.lineWidth=4;c.stroke();
     const angle=this.inf ? this.value : sA+(this.value-this.min)/(this.max-this.min)*(eA-sA);
-    c.beginPath();c.arc(cx,cy,r-5,sA,angle);c.strokeStyle='#7ec8e3';c.lineWidth=4;c.stroke();
+    c.beginPath();c.arc(cx,cy,r-5,sA,angle);c.strokeStyle='#F4F5F0';c.lineWidth=4;c.stroke();
     const nx=cx+Math.cos(angle)*(r-7.5), ny=cy+Math.sin(angle)*(r-7.5);
-    c.beginPath();c.arc(nx,ny,4.5,0,2*Math.PI);c.fillStyle='#bde8f5';c.fill();
+    c.beginPath();c.arc(nx,ny,4.5,0,2*Math.PI);c.fillStyle='#F4F5F0';c.fill();
   }
 }
 
@@ -478,7 +478,7 @@ function drawWaves(c, w, h, t, fb, ft, kb, kt, pb, pt, ampSlider, zoom) {
     const cols = 25; const spacingX = 14; 
     const startX = cx - Math.floor(cols / 2) * spacingX;
     const spacingY = 14; 
-    const colors = ['#40b8e8', '#90d8ef', '#bde8f5', '#7ec8e3', '#3a6a7a'];
+    const colors = ['#F4F5F0', '#EAEAE4', '#D5D6CE', '#BFC0BA', '#181818'];
     
     for (let i = 0; i < cols; i++) {
       c.fillStyle = colors[i % colors.length];
@@ -641,7 +641,7 @@ function frame(ts){
 
   ctx.fillStyle='#06090c';ctx.fillRect(0,0,w,h);
   
-  ctx.strokeStyle = 'rgba(30, 42, 53, 0.2)'; ctx.lineWidth = 1; ctx.beginPath();
+  ctx.strokeStyle = 'rgba(244,245,240,0.14)'; ctx.lineWidth = 1; ctx.beginPath();
   for (let x = 0; x < w; x += 50) { ctx.moveTo(x, 0); ctx.lineTo(x, h); }
   for (let y = 0; y < h; y += 50) { ctx.moveTo(0, y); ctx.lineTo(w, y); }
   ctx.stroke();
